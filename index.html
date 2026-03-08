@@ -1,19 +1,26 @@
 <!DOCTYPE html>
 <html>
+
 <head>
 <title>Zartour QR Generator</title>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
 </head>
 
 <body style="font-family:Arial;text-align:center;margin-top:60px">
 
 <h2>Zartour QR Generator</h2>
 
-<input id="qrText" placeholder="Enter link here" style="padding:10px;width:250px">
+<input id="qrText" placeholder="Enter link or location" style="padding:10px;width:260px">
+
+<br><br>
 
 <button onclick="generateQR()">Generate QR</button>
 
-<div id="qrcode" style="margin-top:20px"></div>
+<button onclick="downloadQR()">Download QR</button>
+
+<div id="qrcode" style="margin-top:25px"></div>
 
 <script>
 
@@ -22,18 +29,34 @@ function generateQR(){
 document.getElementById("qrcode").innerHTML="";
 
 new QRCode(document.getElementById("qrcode"),{
-
 text:document.getElementById("qrText").value,
-
-width:200,
-
-height:200
-
+width:220,
+height:220
 });
+
+}
+
+function downloadQR(){
+
+let img=document.querySelector("#qrcode img");
+
+if(!img){
+alert("Generate QR first");
+return;
+}
+
+let link=document.createElement("a");
+
+link.href=img.src;
+
+link.download="zartour-qr.png";
+
+link.click();
 
 }
 
 </script>
 
 </body>
+
 </html>
