@@ -2,17 +2,22 @@
 <html>
 
 <head>
-<title>Zartour QR Generator</title>
+
+<title>Zartour QR Dashboard</title>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
 </head>
 
-<body style="font-family:Arial;text-align:center;margin-top:60px">
+<body style="font-family:Arial;text-align:center;margin-top:40px">
 
-<h2>Zartour QR Generator</h2>
+<h2>Zartour QR Dashboard</h2>
 
-<input id="qrText" placeholder="Enter link or location" style="padding:10px;width:260px">
+<input id="qrName" placeholder="Location name (Library, Market)" style="padding:10px;width:220px">
+
+<br><br>
+
+<input id="qrText" placeholder="Enter link or route URL" style="padding:10px;width:260px">
 
 <br><br>
 
@@ -22,16 +27,68 @@
 
 <div id="qrcode" style="margin-top:25px"></div>
 
+<h3>Saved QR Locations</h3>
+
+<table border="1" style="margin:auto;margin-top:20px">
+
+<thead>
+
+<tr>
+
+<th>Location</th>
+
+<th>Link</th>
+
+</tr>
+
+</thead>
+
+<tbody id="qrTable">
+
+</tbody>
+
+</table>
+
 <script>
+
+let qrDatabase=[];
 
 function generateQR(){
 
 document.getElementById("qrcode").innerHTML="";
 
+let link=document.getElementById("qrText").value;
+
 new QRCode(document.getElementById("qrcode"),{
-text:document.getElementById("qrText").value,
+
+text:link,
+
 width:220,
+
 height:220
+
+});
+
+let name=document.getElementById("qrName").value;
+
+qrDatabase.push({name:name,link:link});
+
+updateTable();
+
+}
+
+function updateTable(){
+
+let table=document.getElementById("qrTable");
+
+table.innerHTML="";
+
+qrDatabase.forEach(function(qr){
+
+let row="<tr><td>"+qr.name+"</td><td>"+qr.link+"</td></tr>";
+
+table.innerHTML+=row;
+
 });
 
 }
@@ -41,8 +98,11 @@ function downloadQR(){
 let canvas=document.querySelector("#qrcode canvas");
 
 if(!canvas){
+
 alert("Generate QR first");
+
 return;
+
 }
 
 let png=canvas.toDataURL("image/png");
@@ -51,7 +111,7 @@ let link=document.createElement("a");
 
 link.href=png;
 
-link.download="zartour-qr.png";
+link.download=document.getElementById("qrName").value + ".png";
 
 link.click();
 
