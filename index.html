@@ -38,16 +38,18 @@ height:220
 
 function downloadQR(){
 
-let img=document.querySelector("#qrcode img");
+let canvas=document.querySelector("#qrcode canvas");
 
-if(!img){
+if(!canvas){
 alert("Generate QR first");
 return;
 }
 
+let png=canvas.toDataURL("image/png");
+
 let link=document.createElement("a");
 
-link.href=img.src;
+link.href=png;
 
 link.download="zartour-qr.png";
 
