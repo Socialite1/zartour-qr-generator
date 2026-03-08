@@ -1,0 +1,21 @@
+let urlParams = new URLSearchParams(window.location.search)
+let locationID = urlParams.get("id")
+
+async function trackScan(){
+
+let { data } = await supabase
+.from("locations")
+.select("scan_count")
+.eq("id", locationID)
+.single()
+
+let newCount = data.scan_count + 1
+
+await supabase
+.from("locations")
+.update({ scan_count: newCount })
+.eq("id", locationID)
+
+}
+
+trackScan()
