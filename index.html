@@ -118,6 +118,23 @@ link.click();
 
 }
 
+  async function generateQR(){
+
+let name = document.getElementById("qrName").value
+let link = document.getElementById("qrText").value
+
+document.getElementById("qrcode").innerHTML = ""
+
+new QRCode(document.getElementById("qrcode"),{
+text: link,
+width: 220,
+height: 220
+})
+
+await saveLocation(name, link)
+
+  }
+
 </script>
 
 </body>
