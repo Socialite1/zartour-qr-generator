@@ -1,0 +1,23 @@
+async function loadLeaderboard(){
+
+let { data } = await supabase
+.from("locations")
+.select("*")
+.order("scan_count", { ascending:false })
+
+let table=document.getElementById("leaderboard")
+
+data.forEach(loc=>{
+
+table.innerHTML +=
+
+`<tr>
+<td>${loc.name}</td>
+<td>${loc.scan_count}</td>
+</tr>`
+
+})
+
+}
+
+loadLeaderboard()
