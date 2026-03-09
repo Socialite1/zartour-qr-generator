@@ -1,3 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Zartour Scan</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+
+<body>
+
+<h1>Scanning Location...</h1>
+
+<script>
+
+const supabaseUrl = "YOUR_SUPABASE_URL"
+const supabaseKey = "YOUR_PUBLIC_ANON_KEY"
+
+const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey)
+
+const params = new URLSearchParams(window.location.search)
+const qrID = params.get("id")
+
+  
 let urlParams = new URLSearchParams(window.location.search)
 let locationID = urlParams.get("id")
 
@@ -19,3 +41,34 @@ await supabase
 }
 
 trackScan()
+
+async function trackScan(){
+
+const { data } = await supabaseClient
+.from("locations")
+.select("*")
+.eq("qr_id", qrID)
+.single()
+
+if(!data){
+document.body.innerHTML="Invalid QR"
+return
+}
+
+await supabaseClient
+.from("locations")
+.update({
+scan_count: data.scan_count + 1
+})
+.eq("qr_id", qrID)
+
+window.location.href = data.qr_link
+
+}
+
+trackScan()
+
+</script>
+
+</body>
+</html>
