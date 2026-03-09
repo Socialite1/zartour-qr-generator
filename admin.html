@@ -4,26 +4,95 @@
 <head>
 
 <title>Zartour Admin Dashboard</title>
+
 <meta name="viewport" content="width=device-width, initial-scale=1">
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <script src="https://cdn.tailwindcss.com"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 </head>
 
-<body>
+<body class="bg-gray-100 p-6">
 
-<h1>Zartour Dashboard</h1>
+<h1 class="text-3xl font-bold mb-6">Zartour Admin Dashboard</h1>
 
-<h2>Total QR Scans</h2>
-<p id="totalScans">Loading...</p>
+<!-- Analytics -->
+<div class="bg-white p-4 rounded shadow mb-6">
 
-<h2>Locations</h2>
+<h2 class="text-xl font-bold mb-2">Analytics</h2>
+
+<p>Total QR Scans: <span id="totalScans">Loading...</span></p>
+
+<canvas id="scanChart"></canvas>
+
+</div>
+
+<!-- Locations -->
+<div class="bg-white p-4 rounded shadow mb-6">
+
+<h2 class="text-xl font-bold mb-2">Locations</h2>
+
 <ul id="locations"></ul>
 
-<h2>Top Players</h2>
+</div>
+
+<!-- Top Players -->
+<div class="bg-white p-4 rounded shadow mb-6">
+
+<h2 class="text-xl font-bold mb-2">Top Players</h2>
+
 <ul id="players"></ul>
+
+</div>
+
+<!-- Anti Cheat -->
+<div class="bg-white p-4 rounded shadow mb-6">
+
+<h2 class="text-xl font-bold mb-2">Anti-Cheat Monitor</h2>
+
+<ul id="cheaters"></ul>
+
+</div>
+
+<!-- Achievements -->
+<div class="bg-white p-4 rounded shadow mb-6">
+
+<h2 class="text-xl font-bold mb-2">Achievements</h2>
+
+<ul id="achievements"></ul>
+
+</div>
+
+<!-- QR Generator -->
+<div class="bg-white p-4 rounded shadow mb-6">
+
+<h2 class="text-xl font-bold mb-2">QR Generator</h2>
+
+<input id="qrText" class="border p-2" placeholder="Enter QR URL">
+
+<button onclick="generateQR()" class="bg-blue-500 text-white px-3 py-2 ml-2 rounded">
+Generate QR
+</button>
+
+<br><br>
+
+<canvas id="qrcode"></canvas>
+
+<br><br>
+
+<button onclick="downloadQR()" class="bg-green-500 text-white px-3 py-2 rounded">
+Download QR
+</button>
+
+</div>
 
 <script src="admin.js"></script>
 
 </body>
 
-</html>
+  </html>
