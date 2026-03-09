@@ -1,4 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<title>Zartour Leaderboard</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+</head>
+
+<body>
+
+<h1>Zartour Leaderboard</h1>
+
+<ul id="leaderboard"></ul>
+
+<script>
+
+const supabaseUrl = "YOUR_SUPABASE_URL"
+const supabaseKey = "YOUR_PUBLIC_ANON_KEY"
+
+const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey)
+
 async function loadLeaderboard(){
+
+const { data, error } = await supabaseClient
+.from("users")
+.select("name, points")
+.order("points", { ascending: false })
+.limit(10)
+
+const list = document.getElementById("leaderboard")
+
+data.forEach(player => {
+
+let li = document.createElement("li")
+li.innerText = player.name + " — " + player.points + " points"
+
+list.appendChild(li)
+
+})
+
+}
+
+loadLeaderboard()
+
+  async function loadLeaderboard(){
 
 let { data } = await supabase
 .from("locations")
@@ -21,3 +67,9 @@ table.innerHTML +=
 }
 
 loadLeaderboard()
+  
+
+</script>
+
+</body>
+</html>
