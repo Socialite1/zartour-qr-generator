@@ -6,6 +6,9 @@ function generateQRID(){
 return "qr_" + Math.random().toString(36).substring(2,10)
 }
 
+let lat = document.getElementById("lat").value
+let lng = document.getElementById("lng").value
+
 async function saveLocation(name, link){
 
 let qrID = generateQRID()
