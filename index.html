@@ -37,6 +37,8 @@ Zartour
 <input id="qrText" placeholder="Enter link or route URL" style="padding:10px;width:260px">
 
 <br><br>
+    <input id="lat" placeholder="Latitude">
+<input id="lng" placeholder="Longitude">
 
 <button onclick="generateQR()">Generate QR</button>
 
@@ -93,8 +95,7 @@ qrDatabase.push({name:name,link:link});
 updateTable();
 
 }
-  <input id="lat" placeholder="Latitude">
-<input id="lng" placeholder="Longitude">
+
 
 function updateTable(){
 
