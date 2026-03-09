@@ -1,65 +1,153 @@
-loadTotalScans()
-loadLocations()
+const supabase = window.supabase.createClient(
+"YOUR_SUPABASE_URL",
+"YOUR_SUPABASE_PUBLIC_KEY"
+)
+
+loadStats()
 loadPlayers()
+loadLocations()
+loadCheaters()
+loadAchievements()
 
-const supabaseUrl = "https://cqutkhetpnylhconaodf.supabase.co"
-const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNxdXRraGV0cG55bGhjb25hb2RmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI5NTE1MjEsImV4cCI6MjA4ODUyNzUyMX0.CegeRNrSg7vtVCBhn8vsINbebBmoqWzktu3jVB4hbCg"
+// Analytics
+async function loadStats() {
 
-const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey)
+const { data } = await supabase
+.from("scans")
+.select("*")
 
-async function loadTotalScans(){
+document.getElementById("totalScans").innerText = data.length
 
-const { data } = await supabaseClient
-.from("locations")
-.select("scan_count")
+const dates = {}
+data.forEach(scan => {
 
-let total = 0
+const d = scan.created_at.split("T")[0]
 
-data.forEach(loc => {
-total += loc.scan_count
+dates[d] = (dates[d] || 0) + 1
+
 })
 
-document.getElementById("totalScans").innerText = total
+const ctx = document.getElementById("scanChart")
+
+new Chart(ctx, {
+type: "line",
+data: {
+labels: Object.keys(dates),
+datasets: [{
+label: "QR Scans",
+data: Object.values(dates)
+}]
+}
+})
 
 }
-async function loadLocations(){
 
-const { data } = await supabaseClient
-.from("locations")
-.select("name, scan_count")
+// Players
+async function loadPlayers() {
 
-const list = document.getElementById("locations")
-
-data.forEach(loc => {
-
-let li = document.createElement("li")
-
-li.innerText = loc.name + " — " + loc.scan_count + " scans"
-
-list.appendChild(li)
-
-})
-
-  }
-
-async function loadPlayers(){
-
-const { data } = await supabaseClient
-.from("users")
-.select("name, points")
-.order("points",{ascending:false})
+const { data } = await supabase
+.from("players")
+.select("*")
+.order("score", { ascending: false })
 .limit(10)
 
 const list = document.getElementById("players")
 
 data.forEach(player => {
 
-let li = document.createElement("li")
-
-li.innerText = player.name + " — " + player.points + " points"
+const li = document.createElement("li")
+li.innerText = player.name + " — " + player.score
 
 list.appendChild(li)
 
 })
 
-  }
+}
+
+// Locations
+async function loadLocations() {
+
+const { data } = await supabase
+.from("locations")
+.select("*")
+
+const list = document.getElementById("locations")
+
+data.forEach(loc => {
+
+const li = document.createElement("li")
+li.innerText = loc.name
+
+list.appendChild(li)
+
+})
+
+}
+
+// Anti Cheat
+async function loadCheaters() {
+
+const { data } = await supabase
+.from("scans")
+.select("*")
+
+const suspicious = data.filter(s => s.speed_flag == true)
+
+const list = document.getElementById("cheaters")
+
+suspicious.forEach(c => {
+
+const li = document.createElement("li")
+
+li.innerText = "Player " + c.player_id + " suspicious scan"
+
+list.appendChild(li)
+
+})
+
+}
+
+// Achievements
+async function loadAchievements() {
+
+const { data } = await supabase
+.from("achievements")
+.select("*")
+
+const list = document.getElementById("achievements")
+
+data.forEach(a => {
+
+const li = document.createElement("li")
+
+li.innerText = a.name + " — " + a.points + " pts"
+
+list.appendChild(li)
+
+})
+
+}
+
+// QR Generator
+function generateQR() {
+
+const text = document.getElementById("qrText").value
+
+QRCode.toCanvas(document.getElementById("qrcode"), text)
+
+}
+
+// Download QR
+function downloadQR() {
+
+const canvas = document.getElementById("qrcode")
+
+const link = document.createElement("a")
+
+link.download = "zartour-qr.png"
+
+link.href = canvas.toDataURL()
+
+link.click()
+
+            }
