@@ -23,6 +23,40 @@ const qrID = params.get("id")
 let urlParams = new URLSearchParams(window.location.search)
 let locationID = urlParams.get("id")
 
+  async function trackScan(){
+
+const { data: location } = await supabaseClient
+.from("locations")
+.select("*")
+.eq("qr_id", qrID)
+.single()
+
+const userID = localStorage.getItem("user_id")
+
+const { data: user } = await supabaseClient
+.from("users")
+.select("*")
+.eq("id", userID)
+.single()
+
+if(user.current_step !== location.step_order){
+
+alert("You must visit the previous location first!")
+
+return
+
+}
+
+await supabaseClient
+.from("users")
+.update({
+points: user.points + location.points,
+current_step: user.current_step + 1
+})
+.eq("id", userID)
+
+    }
+
 async function trackScan(){
 
 let { data } = await supabase
