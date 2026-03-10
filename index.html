@@ -1,169 +1,156 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
-
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Zartour QR Dashboard</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#2563eb">
 </head>
+<body class="bg-gray-100 font-sans">
 
-<body style="font-family:Arial;text-align:center;margin-top:40px">
-<div class="bg-blue-600 text-white p-4 text-center text-xl">
-Zartour
+<!-- Header -->
+<div class="bg-blue-600 text-white p-4 text-center text-3xl font-bold shadow-md">
+  Zartour QR Dashboard
 </div>
 
-<div class="fixed bottom-0 w-full bg-gray-100 flex justify-around p-3">
+<!-- Input / Form Section -->
+<div class="max-w-xl mx-auto mt-6 bg-white p-6 rounded-xl shadow-lg">
+  <h2 class="text-xl font-semibold mb-4 text-gray-700">Generate New QR</h2>
 
-<a href="index.html">🏠</a>
+  <input id="qrName" placeholder="Location name (Library, Market)" class="w-full p-3 border rounded mb-4">
+  <input id="qrText" placeholder="Enter link or route URL" class="w-full p-3 border rounded mb-4">
 
-<a href="map.html">🗺</a>
+  <div class="flex gap-3 mb-4">
+    <button onclick="generateQR()" class="flex-1 bg-blue-600 text-white p-3 rounded-lg hover:bg-blue-700 transition flex items-center justify-center gap-2">
+      🔗 Generate QR
+    </button>
+    <button onclick="downloadQR()" class="flex-1 bg-green-600 text-white p-3 rounded-lg hover:bg-green-700 transition flex items-center justify-center gap-2">
+      🖨 Download QR
+    </button>
+  </div>
 
-<a href="leaderboard.html">🏆</a>
+  <div class="flex gap-3 mb-4">
+    <input id="lat" placeholder="Latitude" class="flex-1 p-3 border rounded">
+    <input id="lng" placeholder="Longitude" class="flex-1 p-3 border rounded">
+  </div>
 
-<a href="profile.html">👤</a>
+  <div id="qrcode" class="mt-6 flex justify-center"></div>
+</div>
 
-</div> 
-<h2>Zartour QR Dashboard</h2>
-
-<input id="qrName" placeholder="Location name (Library, Market)" style="padding:10px;width:220px">
-
-<br><br>
-
-<input id="qrText" placeholder="Enter link or route URL" style="padding:10px;width:260px">
-
-<br><br>
-    <input id="lat" placeholder="Latitude">
-<input id="lng" placeholder="Longitude">
-
-<button onclick="generateQR()">Generate QR</button>
-
-<button onclick="downloadQR()">Download QR</button>
-
-<div id="qrcode" style="margin-top:25px"></div>
-
-<h3>Saved QR Locations</h3>
-
-<table border="1" style="margin:auto;margin-top:20px">
-
-<thead>
-
-<tr>
-
-<th>Location</th>
-
-<th>Link</th>
-
-</tr>
-
-</thead>
-
-<tbody id="qrTable">
-
-</tbody>
-
-</table>
+<!-- Saved QR Locations Cards -->
+<div class="max-w-4xl mx-auto mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+  <div id="qrCardsContainer" class="col-span-full"></div>
+</div>
 
 <script>
-  const supabaseUrl = "YOUR_SUPABASE_URL"
-const supabaseKey = "YOUR_PUBLIC_ANON_KEY"
+  // Supabase setup
+  const supabaseUrl = "https://cqutkhetpnylhconaodf.supabase.co"
+  const supabaseKey = "YOUR_PUBLIC_ANON_KEY"  // replace with your actual key
+  const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey)
 
-const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey)
+  let qrDatabase = []
 
-let qrDatabase=[];
-  
-  async function saveLocation(name, link){
-
-await supabaseClient
-.from("locations")
-.insert([
-{
-name: name,
-qr_link: link,
-scan_count: 0,
-points: 0
-}
-])
-
+  function generateQRID(){
+    return "qr_" + Math.random().toString(36).substring(2,10)
   }
 
-
-function updateTable(){
-
-let table=document.getElementById("qrTable");
-
-table.innerHTML="";
-
-qrDatabase.forEach(function(qr){
-
-let row="<tr><td>"+qr.name+"</td><td>"+qr.link+"</td></tr>";
-
-table.innerHTML+=row;
-
-});
-
-}
-
-function downloadQR(){
-
-let canvas=document.querySelector("#qrcode canvas");
-
-if(!canvas){
-
-alert("Generate QR first");
-
-return;
-
-}
-
-let png=canvas.toDataURL("image/png");
-
-let link=document.createElement("a");
-
-link.href=png;
-
-link.download=document.getElementById("qrName").value + ".png";
-
-link.click();
-
-}
-async function generateQR(){
-
-let name = document.getElementById("qrName").value
-let link = document.getElementById("qrText").value
-
-document.getElementById("qrcode").innerHTML = ""
-
-new QRCode(document.getElementById("qrcode"),{
-text: link,
-width: 220,
-height: 220
-})
-
-await saveLocation(name, link)
-
-alert("QR saved to Zartour database")
-
-}
-  
   function generateQRCode(link){
-
-document.getElementById("qrcode").innerHTML=""
-
-new QRCode(document.getElementById("qrcode"),{
-text: link,
-width:220,
-height:220
-})
-
+    document.getElementById("qrcode").innerHTML = ""
+    new QRCode(document.getElementById("qrcode"), {
+      text: link,
+      width: 220,
+      height: 220
+    })
   }
 
+  function renderCards(){
+    const container = document.getElementById("qrCardsContainer")
+    container.innerHTML = ""
+    qrDatabase.forEach(qr => {
+      container.innerHTML += `
+        <div class="bg-white p-5 rounded-xl shadow hover:shadow-xl transition flex flex-col items-center text-center">
+          <div class="mb-3 font-semibold text-lg text-gray-700">${qr.name}</div>
+          <div id="card-${qr.qr_id}" class="mb-3"></div>
+          <div class="flex gap-3 mt-2">
+            <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-sm font-medium">Points: ${qr.points}</span>
+            <span class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-sm font-medium">Scans: ${qr.scan_count}</span>
+          </div>
+          <a href="${qr.link}" target="_blank" class="mt-3 text-blue-600 underline text-sm">Visit Link</a>
+        </div>
+      `
+      generateQRCodeForCard(qr.link, `card-${qr.qr_id}`)
+    })
+  }
+
+  function generateQRCodeForCard(link, elementId){
+    new QRCode(document.getElementById(elementId), {
+      text: link,
+      width: 150,
+      height: 150
+    })
+  }
+
+  async function saveLocation(name, link){
+    if(!name || !link){
+      alert("Enter a location name and link first")
+      return
+    }
+
+    let qrID = generateQRID()
+    let lat = document.getElementById("lat").value
+    let lng = document.getElementById("lng").value
+
+    const { data, error } = await supabaseClient
+      .from("locations")
+      .insert([{
+        name: name,
+        qr_link: link,
+        qr_id: qrID,
+        latitude: lat,
+        longitude: lng,
+        scan_count: 0,
+        points: 10
+      }])
+
+    if(error){
+      console.log("Supabase error:", error)
+      return
+    }
+
+    console.log("Location saved:", data)
+    let dynamicURL = "https://yourwebsite.com/scan.html?id=" + qrID
+    generateQRCode(dynamicURL)
+
+    qrDatabase.push({name: name, link: dynamicURL, qr_id: qrID, scan_count: 0, points: 10})
+    renderCards()
+  }
+
+  function generateQR(){
+    let name = document.getElementById("qrName").value
+    let link = document.getElementById("qrText").value
+    saveLocation(name, link)
+  }
+
+  function downloadQR(){
+    let canvas = document.querySelector("#qrcode canvas")
+    if(!canvas){
+      alert("Generate QR first")
+      return
+    }
+    let png = canvas.toDataURL("image/png")
+    let link = document.createElement("a")
+    link.href = png
+    link.download = document.getElementById("qrName").value + ".png"
+    link.click()
+  }
+
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("service-worker.js")
+      .then(() => console.log("Service Worker Registered"))
+  }
 </script>
-
 </body>
-
-</html>
+    </html>
